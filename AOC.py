@@ -390,3 +390,26 @@ def day4_2():
 # day4_2()
 
 def day5_1():
+    with open("day2 - input.txt") as input:
+        states = [num.strip() for num in input.read().split(',')]
+    states = list(map(int, states))
+    states[1] = 12
+    states[2] = 2
+
+    for x,y in itertools.product(range(100), range(100)):
+        codes = copy.copy(states)
+        codes[1] = x
+        codes[2] = y
+    
+        i = 0
+        while codes[i] != 99:
+            if codes[i] == 1:
+                codes[codes[i+3]] = codes[codes[i+1]] + codes[codes[i+2]]
+            elif codes[i] == 2:
+                codes[codes[i+3]] = codes[codes[i+1]] * codes[codes[i+2]]
+            i += 4
+
+        if codes[0] == 19690720:
+            print("noun: {}, verb: {}".format(x,y))
+            print("answer: {}".format((100*x)+y))
+            break
