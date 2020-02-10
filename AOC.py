@@ -444,4 +444,109 @@ def day5_1():
         else:
             print("something went wrong :()")
             sys.exit()
-day5_1()
+# day5_1()
+
+def day5_2():
+    # with open("day5 - input.txt") as input:
+    #     states = [num.strip() for num in input.read().split(',')]
+    # states = list(map(int, states))
+    # states = [3,9,8,9,10,9,4,9,99,-1,8]
+    # states = [3,9,7,9,10,9,4,9,99,-1,8]
+    # states = [3,3,1108,-1,8,3,4,3,99]
+    # states = [3,3,1107,-1,8,3,4,3,99]
+    
+    # states = [3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9]
+    states = [3,3,1105,-1,9,1101,0,0,12,4,12,99,1]
+
+    # states = [3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99]
+
+    ops = {
+        "1": operator.add,
+        "2": operator.mul,
+        "7": operator.lt,
+        "8": operator.eq
+    }
+    opcode_add = "1"
+    opcode_mul = "2"
+    opcode_save = "3"
+    opcode_out = "4"
+    opcode_jump_true = "5"
+    opcode_jump_false = "6"
+    opcode_less_than = "7"
+    opcode_equals = "8"
+    opcode_halt = 99
+    code_input = 0
+
+    codes = copy.copy(states)
+
+    i = 5
+    while codes[i] != opcode_halt:
+        instr = str(codes[i])
+        parameter_1 = None
+        parameter_2 = None
+        parameter_3 = None
+        if instr[-1:] == opcode_add or instr[-1:] == opcode_mul:
+            op_func = ops[instr[-1:]]
+            try:
+                if instr[-3] == "1": parameter_1 = codes[i+1]
+                if instr[-4] == "1": parameter_2 = codes[i+2]
+            except IndexError: pass
+            if parameter_1 is None: parameter_1 = codes[codes[i+1]]
+            if parameter_2 is None: parameter_2 = codes[codes[i+2]]
+            codes[codes[i+3]] = op_func(parameter_1, parameter_2)
+            print("oper: {}, param1: {}, param2: {}".format(ops[instr[-1:]], parameter_1, parameter_2))
+            i += 4
+        elif instr[-1:] == opcode_save:
+            print("saved in loc[{}]: {}".format(codes[i+1], code_input))
+            codes[codes[i+1]] = code_input
+            i += 2
+        elif instr[-1:] == opcode_out:
+            try:
+                if instr[-3] == "1":
+                    parameter_1 = codes[i+1]
+                    print("value at codes[i+1]: {}".format(parameter_1))
+                    i += 2
+                    continue
+            except IndexError:
+                parameter_1 = codes[codes[i+1]]
+                print("value at address {}: {}".format(codes[i+1], parameter_1))
+                i += 2
+        elif instr[-1:] == opcode_jump_true or instr[-1:] == opcode_jump_false:
+            jump = True if instr[-1:] == opcode_jump_true else False
+            print("jump is: {}".format(jump))
+            try:
+                if instr[-3] == "1": parameter_1 = codes[i+1]
+                if instr[-4] == "1": parameter_2 = codes[i+2]
+            except IndexError: pass
+            if parameter_1 is None: parameter_1 = codes[codes[i+1]]
+            if parameter_2 is None: parameter_2 = codes[codes[i+2]]
+            print("parameter_1 is: {}".format(parameter_1))
+            # if (parameter_1 and instr[-1:] == opcode_jump_true) or (not(parameter_1) and instr[-1:] == opcode_jump_false):
+                # i = parameter_2
+            # else: i += 2
+            # if parameter_1 and jump:
+                # i = parameter_2
+            # elif not(parameter_1) and not(jump):
+                # i = parameter_2
+            # else:
+                # print("go to next")
+                # i += 2
+
+            i = parameter_2 if bool(parameter_1) == jump else i+2
+            # if not(jump != parameter_1): print("jumped")
+        elif instr[-1:] == opcode_less_than or instr[-1:] == opcode_equals:
+            try:
+                if instr[-3] == "1": parameter_1 = codes[i+1]
+                if instr[-4] == "1": parameter_2 = codes[i+2]
+                # if instr[-5] == "1": parameter_3 = codes[i+3]
+            except IndexError: pass
+            if parameter_1 is None: parameter_1 = codes[codes[i+1]]
+            if parameter_2 is None: parameter_2 = codes[codes[i+2]]
+            # if parameter_3 is None: parameter_3 = codes[codes[i+3]]
+            op_func = ops[instr[-1:]]
+            codes[codes[i+3]] = 1 if op_func(parameter_1, parameter_2) else 0
+            i += 4
+        else:
+            print("something went wrong :()")
+            sys.exit()
+day5_2()
