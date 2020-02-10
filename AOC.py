@@ -513,40 +513,24 @@ def day5_2():
             i += 2
         elif instr[-1:] == opcode_jump_true or instr[-1:] == opcode_jump_false:
             jump = True if instr[-1:] == opcode_jump_true else False
-            # print("jump is: {}".format(jump))
             try:
                 if instr[-3] == "1": parameter_1 = codes[i+1]
                 if instr[-4] == "1": parameter_2 = codes[i+2]
             except IndexError: pass
             if parameter_1 is None: parameter_1 = codes[codes[i+1]]
             if parameter_2 is None: parameter_2 = codes[codes[i+2]]
-            # print("parameter_1 is: {}".format(parameter_1))
-            # if (parameter_1 and instr[-1:] == opcode_jump_true) or (not(parameter_1) and instr[-1:] == opcode_jump_false):
-                # i = parameter_2
-            # else: i += 2
-            # if parameter_1 and jump:
-                # i = parameter_2
-            # elif not(parameter_1) and not(jump):
-                # i = parameter_2
-            # else:
-                # print("go to next")
-                # i += 2
-
             i = parameter_2 if bool(parameter_1) == jump else i+3
-            # if not(jump != parameter_1): print("jumped")
         elif instr[-1:] == opcode_less_than or instr[-1:] == opcode_equals:
             try:
                 if instr[-3] == "1": parameter_1 = codes[i+1]
                 if instr[-4] == "1": parameter_2 = codes[i+2]
-                # if instr[-5] == "1": parameter_3 = codes[i+3]
             except IndexError: pass
             if parameter_1 is None: parameter_1 = codes[codes[i+1]]
             if parameter_2 is None: parameter_2 = codes[codes[i+2]]
-            # if parameter_3 is None: parameter_3 = codes[codes[i+3]]
             op_func = ops[instr[-1:]]
             codes[codes[i+3]] = 1 if op_func(parameter_1, parameter_2) else 0
             i += 4
         else:
-            print("something went wrong :()")
+            print("something went wrong :(")
             sys.exit()
 day5_2()
