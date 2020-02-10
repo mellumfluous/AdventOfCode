@@ -1,6 +1,8 @@
 import itertools
 import copy
 import re
+import operator
+import sys
 from collections import Counter
 
 # 3331523
@@ -17,6 +19,11 @@ def day1_1():
 
 # 4994396
 def day1_2():
+    def day1_2_rec(num):
+        if ((num // 3) - 2) <= 0:
+            return num
+        else:
+            return num + day1_2_rec(num // 3 - 2) 
     sum = 0
     with open("day1 - input.txt") as input:
         modules = input.read().split()
@@ -25,11 +32,6 @@ def day1_2():
         sum +=day1_2_rec(int(module)//3-2)
     print(str(sum))
 
-def day1_2_rec(num):
-    if ((num // 3) - 2) <= 0:
-        return num
-    else:
-        return num + day1_2_rec(num // 3 - 2) 
 # day1_2()
 
 #==============================================================================
@@ -389,28 +391,57 @@ def day4_2():
     print(sum)
 # day4_2()
 
+# 9006673
 def day5_1():
-    with open("day2 - input.txt") as input:
+    with open("day5 - input.txt") as input:
         states = [num.strip() for num in input.read().split(',')]
     states = list(map(int, states))
-    states[1] = 12
-    states[2] = 2
 
-    for x,y in itertools.product(range(100), range(100)):
-        codes = copy.copy(states)
-        codes[1] = x
-        codes[2] = y
-    
-        i = 0
-        while codes[i] != 99:
-            if codes[i] == 1:
-                codes[codes[i+3]] = codes[codes[i+1]] + codes[codes[i+2]]
-            elif codes[i] == 2:
-                codes[codes[i+3]] = codes[codes[i+1]] * codes[codes[i+2]]
+    ops = {
+        "1": operator.add,
+        "2": operator.mul
+    }
+    opcode_add = "1"
+    opcode_mul = "2"
+    opcode_save = "3"
+    opcode_out = "4"
+    opcode_halt = 99
+    code_input = 1
+
+    codes = copy.copy(states)
+
+    i = 0
+    while codes[i] != opcode_halt:
+        instr = str(codes[i])
+        parameter_1 = None
+        parameter_2 = None
+        parameter_3 = None
+        if instr[-1:] == opcode_add or instr[-1:] == opcode_mul:
+            op_func = ops[instr[-1:]]
+            try:
+                if instr[-3] == "1": parameter_1 = codes[i+1]
+                if instr[-4] == "1": parameter_2 = codes[i+2]
+            except IndexError:
+                pass
+            if parameter_1 is None: parameter_1 = codes[codes[i+1]]
+            if parameter_2 is None: parameter_2 = codes[codes[i+2]]
+            codes[codes[i+3]] = op_func(parameter_1, parameter_2)
             i += 4
-
-        if codes[0] == 19690720:
-            print("noun: {}, verb: {}".format(x,y))
-            print("answer: {}".format((100*x)+y))
-            break
-# test
+        elif instr[-1:] == opcode_save:
+            codes[codes[i+1]] = code_input
+            i += 2
+        elif instr[-1:] == opcode_out:
+            try:
+                if instr[-3] == "1":
+                    parameter_1 = codes[i+1]
+                    print("value at codes[i+1]: {}".format(parameter_1))
+                    i += 2
+                    continue
+            except IndexError:
+                parameter_1 = codes[codes[i+1]]
+                print("value at address {}: {}".format(codes[codes[i+1]], parameter_1))
+                i += 2
+        else:
+            print("something went wrong :()")
+            sys.exit()
+day5_1()
