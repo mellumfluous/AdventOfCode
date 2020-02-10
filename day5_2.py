@@ -22,6 +22,8 @@ def day5_2():
         "7": operator.lt,
         "8": operator.eq
     }
+    next_instr = [0, 4, 4, 2, 2, 0, 0, 4, 4]
+
     opcode_add = "1"
     opcode_mul = "2"
     opcode_save = "3"
@@ -37,33 +39,30 @@ def day5_2():
 
     i = 0
     while codes[i] != opcode_halt:
-        instr = str(codes[i])
-        instr = "0"*(5-len(instr)) + instr
+        # instr = "0"*(5-len(str(instr))) + str(instr)
+        instr = f"{codes[i]:05}"
+        op = instr[-1]
 
         try:
             parameter_1 = codes[codes[i+1]] if instr[-3] == "0" else codes[i+1]
             parameter_2 = codes[codes[i+2]] if instr[-4] == "0" else codes[i+2]
         except IndexError: pass
-        if instr[-1:] == opcode_add or instr[-1:] == opcode_mul:
-            op_func = ops[instr[-1:]]
+        if op == opcode_add or op == opcode_mul:
+            op_func = ops[op]
             codes[codes[i+3]] = op_func(parameter_1, parameter_2)
-            i += 4
-        elif instr[-1:] == opcode_save:
+        elif op == opcode_save:
             codes[codes[i+1]] = code_input
-            i += 2
-        elif instr[-1:] == opcode_out:
-            address = codes[i+1]
-            if instr[-3] == "1": address = i
+        elif op == opcode_out:
+            address = i if instr[-3] == "1" else codes[i+1]
             print("value at address {}: {}".format(address, parameter_1))
-            i += 2
-        elif instr[4] == opcode_jump_true or instr[-1] == opcode_jump_false:
-            jump = True if instr[-1] == opcode_jump_true else False
+        elif instr[4] == opcode_jump_true or op == opcode_jump_false:
+            jump = True if op == opcode_jump_true else False
             i = parameter_2 if bool(parameter_1) == jump else i+3
-        elif instr[4] == opcode_less_than or instr[-1] == opcode_equals:
-            op_func = ops[instr[-1]]
+        elif instr[4] == opcode_less_than or op == opcode_equals:
+            op_func = ops[op]
             codes[codes[i+3]] = 1 if op_func(parameter_1, parameter_2) else 0
-            i += 4
         else:
             print("something went wrong :(")
             sys.exit()
+        i += next_instr[int(op)]
 day5_2()
