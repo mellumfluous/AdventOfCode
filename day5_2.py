@@ -39,7 +39,6 @@ def day5_2():
 
     i = 0
     while codes[i] != opcode_halt:
-        # instr = "0"*(5-len(str(instr))) + str(instr)
         instr = f"{codes[i]:05}"
         op = instr[-1]
 

@@ -533,4 +533,55 @@ def day5_2():
         else:
             print("something went wrong :(")
             sys.exit()
-day5_2()
+# day5_2()
+
+# 142915
+# 735 is too low
+total_sum = 0
+def day6_1():
+
+    class Node:
+        def __init__(self, name):
+            self.paths = 0
+            self.parent = None
+            self.children = []
+            self.name = name
+            self.total_paths = 0
+
+    with open("day6 - input.txt") as input:
+        orbits = [num for num in input.read().split()]
+    orbs = {}
+    ind_orbs = {}
+    # orbits = ["COM)B", "B)C", "C)D", "D)E", "E)F", "B)G", "G)H", "D)I", "E)J", "J)K", "K)L"]
+    # orbits = ["COM)A", "B)C", "A)B", "B)D"]
+    for orbit in orbits:
+        orbital = re.search(r'(.*)\)(.*)', orbit)
+        orbiter = orbital.group(2)
+        orbited = orbital.group(1)
+        # print(f"orbited: {orbited}, orbiter: {orbiter}")
+
+        child = orbs[orbiter] if orbiter in orbs else Node(orbiter)
+        parent = orbs[orbited] if orbited in orbs else Node(orbited)
+        parent.children.append(child)
+        child.parent = parent
+
+        if orbited not in orbs:
+            orbs[orbited] = parent
+        if orbiter not in orbs:
+            orbs[orbiter] = child
+
+
+    def find_paths(root):
+        global total_sum
+        if root.children == []:
+            return
+        for child in root.children:
+            child.paths = root.paths+1
+            total_sum += child.paths
+            # print(f"root name: {root.name}, root paths: {root.paths}, child name: {child.name}, child paths: {child.paths}")
+            find_paths(child)
+    root = orbs['COM']
+    find_paths(root)
+    print(total_sum)
+
+# day6_1()
