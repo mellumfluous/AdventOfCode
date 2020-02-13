@@ -546,7 +546,6 @@ def day6_1():
             self.parent = None
             self.children = []
             self.name = name
-            self.total_paths = 0
 
     with open("day6 - input.txt") as input:
         orbits = [num for num in input.read().split()]
@@ -570,7 +569,6 @@ def day6_1():
         if orbiter not in orbs:
             orbs[orbiter] = child
 
-
     def find_paths(root):
         global total_sum
         if root.children == []:
@@ -585,3 +583,32 @@ def day6_1():
     print(total_sum)
 
 # day6_1()
+
+def day6_2(): # redditor mgoszcz2
+
+    # Takes in a key of the orbits dictionary
+    def trace(obj):
+        # makes a set containing just the start path
+        path = {obj}
+        # loop through the orbits, get the next key and add it to the path
+        # when obj is not in orbits, then we've reached a node with no parent
+        while obj in orbits:
+            obj = orbits[obj]
+            path.add(obj)
+        return path
+
+    with open("day6 - input.txt") as input:
+        data = [num for num in input.read().split()]
+    # data = ["COM)B", "B)C", "C)D", "D)E", "E)F", "B)G", "G)H", "D)I", "E)J", "J)K", "K)L"]
+    # data = ["COM)A", "B)C", "A)B", "B)D"]
+    # data = ["COM)B", "B)C", "C)D", "D)E", "E)F", "B)G", "G)H", "D)I", "E)J", "J)K", "K)L", "K)YOU", "I)SAN"]
+
+    # x is the parent, y is the child. The orbits dictionary is "backwards" in that
+    # the children are keys and the parents are values. If we did it the other way around,
+    # one parent could have many children so we'd need a list of the children; here we don't.
+    orbits = {y: x for x, y in (x.strip().split(")") for x in data)}
+    print(sum(len(trace(x)) - 1 for x in orbits.keys()))
+    print(len(trace("YOU") ^ trace("SAN")) - 2)
+
+# day6_2()
+
